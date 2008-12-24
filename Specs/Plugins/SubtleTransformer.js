@@ -15,7 +15,7 @@ describe('SubtleTransformer', {
 	},
 
 	'should do what it was designed to do': function(){
-		value_of( 'value' ).should_be( 'result' );
+		value_of( SubtleTransformer ).should_not_be_undefined();
 	}
 
 });
