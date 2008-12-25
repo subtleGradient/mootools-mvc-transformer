@@ -1,10 +1,3 @@
-/*
-Script: Selectors.Children.js
-	Specification Examples of Pseudo Selector :children.
-
-License:
-	MIT-style license.
-*/
 
 describe('SubtleTransformer', {
 
