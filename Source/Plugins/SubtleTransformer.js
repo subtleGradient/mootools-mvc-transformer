@@ -11,28 +11,48 @@ Copyright:
 */
 var SubtleTransformer = new Class({
 	
-	initialize: function(obj, keys, _set, _get){
-		keys = $splat(keys);
-		this.obj = obj;
-		
-		_set && (this._set = _set);
-		_get && (this._get = _get);
-		
+	initialize: function(obj, options){
 		var self = this;
-		this.set = function(keyOrValue, value) {
-			if (value==undefined)
-				return self.obj.set(keys[0], self._set(keyOrValue));
-			else
-				return self.obj.set(key, self._set(value));
+		self.obj = obj;
+		
+		switch($type(options)){
+		case 'string':
+		case 'array':
+			self.keys = $splat(options);
+			break;
+		case 'hash':
+		case 'object':
+			options.keys && (this.keys = $splat(options.keys));
+			options.get && (this._get = options.get);
+			options.set && (this._set = options.set);
+			break;
+		}
+		
+		self.set = function(key, value) {
+			if (self.keys && self.keys.length && value==undefined){
+				value = key;
+				self.keys.each(function(key){
+					self.obj.set(key, self._set(value));
+				});
+				return self;
+			}else{
+				self.obj.set(key, self._set(value));
+				return self;
+			}
 		};
-		this.get = function(key) {
-			if (key==undefined)
-				return self._get( self.obj.get(keys[0]) );
-			else
+		
+		self.get = function(key) {
+			if (self.keys && self.keys.length && key==undefined){
+				if (self.keys.length == 1)
+					return self._get( self.obj.get(self.keys[0]) );
+				return self.keys.map(function(key){
+					return self._get( self.obj.get(key) );
+				});
+			}else
 				return self._get( self.obj.get(key) );
 		};
 		
-		keys.each(function(key){
+		self.keys && self.keys.each(function(key){
 			self['set' + String.camelCase(key).capitalize()] = function(value) {
 				return self.obj.set(key, self._set(value));
 			};
